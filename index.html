@@ -1297,7 +1297,7 @@
 <script>
   // Initialize EmailJS with your user ID
   (function() {
-    emailjs.init('service_bguc60s'); // Replace with your actual user ID
+    emailjs.init('Burra_Kranthi_Kiran'); // Replace with your actual user ID
   })();
 
   document.querySelector('.form').addEventListener('submit', function(event) {
@@ -1311,7 +1311,7 @@
     };
 
     // Send email via EmailJS
-    emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', formData)
+    emailjs.send('service_bguc60s', 'YOUR_TEMPLATE_ID', formData)
       .then(function(response) {
         console.log('SUCCESS!', response.status, response.text);
         alert('Your message has been sent successfully!');
