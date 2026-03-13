@@ -61,15 +61,17 @@ const selectItems = document.querySelectorAll("[data-select-item]");
 const selectValue = document.querySelector("[data-selecct-value]");
 const filterBtn = document.querySelectorAll("[data-filter-btn]");
 
-select.addEventListener("click", function () { elementToggleFunc(this); });
+if (select) {
+  select.addEventListener("click", function () { elementToggleFunc(this); });
+}
 
 // add event in all select items
 for (let i = 0; i < selectItems.length; i++) {
   selectItems[i].addEventListener("click", function () {
 
     let selectedValue = this.innerText.toLowerCase();
-    selectValue.innerText = this.innerText;
-    elementToggleFunc(select);
+    if (selectValue) selectValue.innerText = this.innerText;
+    if (select) elementToggleFunc(select);
     filterFunc(selectedValue);
 
   });
@@ -95,17 +97,17 @@ const filterFunc = function (selectedValue) {
 }
 
 // add event in all filter button items for large screen
-let lastClickedBtn = filterBtn[0];
+let lastClickedBtn = filterBtn.length > 0 ? filterBtn[0] : null;
 
 for (let i = 0; i < filterBtn.length; i++) {
 
   filterBtn[i].addEventListener("click", function () {
 
     let selectedValue = this.innerText.toLowerCase();
-    selectValue.innerText = this.innerText;
+    if (selectValue) selectValue.innerText = this.innerText;
     filterFunc(selectedValue);
 
-    lastClickedBtn.classList.remove("active");
+    if (lastClickedBtn) lastClickedBtn.classList.remove("active");
     this.classList.add("active");
     lastClickedBtn = this;
 
@@ -144,16 +146,91 @@ const pages = document.querySelectorAll("[data-page]");
 for (let i = 0; i < navigationLinks.length; i++) {
   navigationLinks[i].addEventListener("click", function () {
 
-    for (let i = 0; i < pages.length; i++) {
-      if (this.innerHTML.toLowerCase() === pages[i].dataset.page) {
-        pages[i].classList.add("active");
-        navigationLinks[i].classList.add("active");
+    for (let j = 0; j < pages.length; j++) {
+      if (this.innerHTML.toLowerCase() === pages[j].dataset.page) {
+        pages[j].classList.add("active");
         window.scrollTo(0, 0);
       } else {
-        pages[i].classList.remove("active");
-        navigationLinks[i].classList.remove("active");
+        pages[j].classList.remove("active");
+      }
+    }
+
+    for (let j = 0; j < navigationLinks.length; j++) {
+      if (this === navigationLinks[j]) {
+        navigationLinks[j].classList.add("active");
+      } else {
+        navigationLinks[j].classList.remove("active");
       }
     }
 
   });
 }
+
+// FAQ UI / Accordion for Projects
+const projectAccordions = document.querySelectorAll('.project-accordion-item');
+
+projectAccordions.forEach(item => {
+  const header = item.querySelector('.project-header');
+
+  if (header) {
+    header.addEventListener('click', () => {
+      // Close other accordions when one opens (optional FAQ behavior)
+      projectAccordions.forEach(acc => {
+        if (acc !== item) {
+          acc.classList.remove('active');
+        }
+      });
+
+      // Toggle the clicked one
+      item.classList.toggle('active');
+    });
+  }
+});
+
+
+// Form submission handling
+
+// Add event listener to form submission
+
+form.addEventListener("submit", function (event) {
+  event.preventDefault(); // Prevent default form submission
+
+  // Get form data
+  const formData = new FormData(form);
+
+  // FormData objects don't show their contents with a simple console.log().
+  // To view the data, you can convert it to an object or iterate through entries:
+  console.log("Form Data Entries:", Object.fromEntries(formData));
+
+  let message = " You have received a new message from your portfolio website. Here are the details:"
+  message += "Name: " + formData.get("fullname") + "\n";
+  message += "Email: " + formData.get("email") + "\n";
+  message += "Message: " + formData.get("message") + "\n";
+
+  console.log(message);
+  let respBody = {
+    "number": "917702597518",
+    "message": message
+  }
+
+  // Send form data to server
+  fetch("https://whatsappotp.burrakranthikiran.online/send", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(respBody),
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      if (data.status === "success" || data.success) {
+        alert("Message sent successfully!");
+        form.reset();
+        formBtn.setAttribute("disabled", "");
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    });
+});
